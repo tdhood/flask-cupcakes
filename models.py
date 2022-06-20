@@ -4,6 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
+
 def connect_db(app):
     """Connect to database."""
 
@@ -14,29 +15,14 @@ def connect_db(app):
 class Cupcake(db.Model):
     """Cupcake."""
 
-    __tablename__= "cupcakes"
+    __tablename__ = "cupcakes"
 
-    id = db.Column(
-        db.Integer,
-        primary_key=True,
-        autoincrement=True
-    )
-    flavor = db.Column(
-        db.Text,
-        nullable=False
-    )
-    size = db.Column(
-        db.Text,
-        nullable=False
-    )
-    rating = db.Column(
-        db.Integer,
-        nullable=False
-    )
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    flavor = db.Column(db.Text, nullable=False)
+    size = db.Column(db.Text, nullable=False)
+    rating = db.Column(db.Integer, nullable=False)
     image = db.Column(
-        db.Text,
-        nullable=False,
-        default='https://tinyurl.com/demo-cupcake'
+        db.Text, nullable=False, default="https://tinyurl.com/demo-cupcake"
     )
 
     def serialize(self):
@@ -47,5 +33,5 @@ class Cupcake(db.Model):
             "flavor": self.flavor,
             "size": self.size,
             "rating": self.rating,
-            "image": self.image
+            "image": self.image,
         }
