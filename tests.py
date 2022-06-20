@@ -117,3 +117,59 @@ class CupcakeViewsTestCase(TestCase):
             )
 
             self.assertEqual(Cupcake.query.count(), 2)
+
+    def test_patch_cupcake(self):
+        with app.test_client() as client:
+            url = f"/api/cupcakes/{self.cupcake.id}"
+
+            cupcake = Cupcake.query.get_or_404(self.cupcake.id) 
+            resp = client.patch(url, json=CUPCAKE_DATA_2)
+
+            self.assertEqual(resp.status_code, 200)
+
+            data = resp.json.copy()
+
+            # don't know what ID we'll get, make sure it's an int & normalize
+            self.assertIsInstance(data["cupcake"]["id"], int)
+        
+
+            self.assertEqual(
+                data,
+                {
+                    "cupcake": {
+                        "id": self.cupcake.id,
+                        "flavor": "TestFlavor2",
+                        "size": "TestSize2",
+                        "rating": 10,
+                        "image": "http://test.com/cupcake2.jpg",
+                    }
+                },
+            )
+
+            self.assertEqual(Cupcake.query.count(), 1)
+        
+    def test_delete_cupcake(self):
+        with app.test_client() as client:
+            url = f"/api/cupcakes/{self.cupcake.id}"
+
+            cupcake = Cupcake.query.get_or_404(self.cupcake.id)
+            resp = client.delete(url) 
+
+            self.assertEqual(resp.status_code, 200)
+
+            data = resp.json
+            self.assertEqual(
+                    data,
+                    {
+                        "deleted": self.cupcake.id     
+                    })
+        
+    def test_delete_nonexisting_cupcake(self):
+        with app.test_client() as client:
+            url = f"/api/cupcakes/99999999"
+
+            resp = client.delete(url)
+
+            self.assertEqual(resp.status_code, 404)
+
+    
