@@ -1,7 +1,7 @@
 """Flask app for Cupcakes"""
 
 from flask import Flask, request, jsonify
-from models import db, connect_db, Cupcake
+from models import db, connect_db, Cupcake, DEFAULT_IMAGE
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql:///cupcakes"
@@ -43,8 +43,8 @@ def create_cupcake():
     flavor = request.json["flavor"]
     size = request.json["size"]
     rating = request.json["rating"]
-    image = request.json.get("image") #get value at image or returns default
-    # image = request.json["image"] or None
+    # image = request.json.get("image") #get value at image or returns default
+    image = request.json["image"] or None
 
     new_cupcake = Cupcake(flavor=flavor, size=size, rating=rating, image=image)
 
@@ -64,13 +64,20 @@ def update_a_cupcake(cupcake_id):
     cupcake.flavor = request.json.get("flavor", cupcake.flavor)
     cupcake.size = request.json.get("size", cupcake.size)
     cupcake.rating = request.json.get("rating", cupcake.rating)
-    cupcake.image = request.json.get("image", cupcake.image)
+
+    if request.json["image"]:
+        cupcake.image = request.json["image"]
+    else: 
+        cupcake.image = DEFAULT_IMAGE
+
+    # cupcake.image = request.json.get("image", cupcake.image)
+    # check for empty string for image key
 
     db.session.add(cupcake)
     db.session.commit()
 
     serialized = cupcake.serialize()
-    return (jsonify(cupcake=serialized), 200)
+    return jsonify(cupcake=serialized)
 
 @app.delete("/api/cupcakes/<int:cupcake_id>")
 def delete_a_cupcake(cupcake_id):
@@ -83,4 +90,4 @@ def delete_a_cupcake(cupcake_id):
 
     # {deleted: [cupcake-id]}
 
-    return (jsonify(deleted=cupcake_id), 200)
+    return jsonify(deleted=cupcake_id)
