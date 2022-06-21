@@ -1,6 +1,6 @@
 """Flask app for Cupcakes"""
 
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 from models import db, connect_db, Cupcake, DEFAULT_IMAGE
 
 app = Flask(__name__)
@@ -12,6 +12,11 @@ connect_db(app)
 
 db.create_all()
 
+@app.get("/")
+def show_cupcakes_and_show_form():
+
+
+    return render_template("homepage.html")
 
 @app.get("/api/cupcakes")
 def list_all_cupcakes():
@@ -67,7 +72,7 @@ def update_a_cupcake(cupcake_id):
 
     if request.json["image"]:
         cupcake.image = request.json["image"]
-    else: 
+    else:
         cupcake.image = DEFAULT_IMAGE
 
     # cupcake.image = request.json.get("image", cupcake.image)
