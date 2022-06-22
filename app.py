@@ -13,10 +13,11 @@ connect_db(app)
 db.create_all()
 
 @app.get("/")
-def show_cupcakes_and_show_form():
-
+def root():
+    """render homepage"""
 
     return render_template("homepage.html")
+
 
 @app.get("/api/cupcakes")
 def list_all_cupcakes():
@@ -53,6 +54,16 @@ def create_cupcake():
 
     new_cupcake = Cupcake(flavor=flavor, size=size, rating=rating, image=image)
 
+    """
+     data = request.json
+
+    cupcake = Cupcake(
+        flavor=data['flavor'],
+        rating=data['rating'],
+        size=data['size'],
+        image=data['image'] or None)
+
+    """
     db.session.add(new_cupcake)
     db.session.commit()
 
@@ -74,6 +85,20 @@ def update_a_cupcake(cupcake_id):
         cupcake.image = request.json["image"]
     else:
         cupcake.image = DEFAULT_IMAGE
+    
+    """
+    data = request.json
+
+    cupcake = Cupcake.query.get_or_404(cupcake_id)
+
+    cupcake.flavor = data.get('flavor', cupcake.flavor)
+    cupcake.rating = data.get('rating', cupcake.rating)
+    cupcake.size = data.get('size', cupcake.size)
+
+    if "image" in data:
+        cupcake.image = data['image'] or DEFAULT_IMAGE
+
+    """
 
     # cupcake.image = request.json.get("image", cupcake.image)
     # check for empty string for image key
@@ -86,7 +111,9 @@ def update_a_cupcake(cupcake_id):
 
 @app.delete("/api/cupcakes/<int:cupcake_id>")
 def delete_a_cupcake(cupcake_id):
-    """delete cupcake from database"""
+    """delete cupcake from database
+    
+    Returns JSON {deleted: 'cupcake_id'}"""
 
     cupcake = Cupcake.query.get_or_404(cupcake_id)
 
